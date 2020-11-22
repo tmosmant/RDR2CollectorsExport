@@ -1,7 +1,7 @@
-let fetchButton = document.getElementById("fetch");
+let exportButton = document.getElementById("export");
 
-fetchButton.onclick = function (element) {
+exportButton.onclick = function (element) {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    chrome.tabs.executeScript(null, { file: "fetch-script.js" });
+    chrome.tabs.executeScript(null, { file: "export-script.js" });
   });
 };
