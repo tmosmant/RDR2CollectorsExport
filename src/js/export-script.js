@@ -19,7 +19,6 @@ async function navigate(card) {
   ticks.forEach((tick) => {
     const previous = result[key] || [];
     result[key] = [tick.previousSibling.textContent, ...previous];
-    // result[tick.previousSibling.textContent] = true;
   });
 
   bagLink.click(); // could also be history.back()
@@ -46,6 +45,40 @@ function parseResult(value) {
       remove: " of Swords Tarot Card",
       prefix: "swords_",
     },
+    "family-heirlooms": {
+      remove: "",
+      prefix: "heirlooms_",
+      replacement: {
+        from: " ",
+        to: "_",
+      },
+      exceptions: {
+        heirlooms_new_guinea_rosewood_hairbrush: [
+          "heirlooms_new_guinea_rosewood",
+        ],
+        heirlooms_carved_wooden_hairpin: ["heirlooms_carved_wooden"],
+      },
+    },
+    "antique-alcohol-bottles": {
+      remove: "",
+      prefix: "bottle_",
+      replacement: {
+        from: " ",
+        to: "_",
+      },
+      exceptions: {
+        bottle_cognac: ["bottle_cognac_bottle"],
+        bottle_tennessee_whiskey: ["bottle_tennesee_whiskey"],
+      },
+    },
+    "bird-eggs": {
+      remove: " Egg",
+      prefix: "egg_",
+      exceptions: {
+        egg_hawk: ["egg_hawk_1", "egg_hawk_2"],
+        egg_eagle: ["egg_eagle_1", "egg_eagle_2"],
+      },
+    },
   };
 
   const collected = {};
@@ -53,11 +86,30 @@ function parseResult(value) {
   Object.keys(allowedValues).forEach((key) => {
     if (value[key]) {
       value[key].forEach((item) => {
-        const name =
-          allowedValues[key].prefix +
-          item.replace(allowedValues[key].remove, "").toLocaleLowerCase();
-        collected[`collected.${name}`] = "true";
-        collected[`amount.${name}`] = "1";
+        const transform = allowedValues[key];
+
+        let name = transform.prefix + item.replaceAll(transform.remove, "");
+
+        if (transform.replacement) {
+          console.log(name, transform.replacement);
+          name = name.replaceAll(
+            transform.replacement.from,
+            transform.replacement.to
+          );
+        }
+
+        name = name.toLocaleLowerCase();
+
+        let names = [name];
+
+        if (transform.exceptions && transform.exceptions[name]) {
+          names = transform.exceptions[name];
+        }
+
+        names.forEach((name) => {
+          collected[`collected.${name}`] = "true";
+          collected[`amount.${name}`] = "1";
+        });
       });
     }
   });
@@ -71,34 +123,27 @@ function parseResult(value) {
 }
 
 function download(data, filename, type) {
-  var file = new Blob([data], { type: type });
-  if (window.navigator.msSaveOrOpenBlob)
-    // IE10+
-    window.navigator.msSaveOrOpenBlob(file, filename);
-  else {
-    // Others
-    var a = document.createElement("a"),
-      url = URL.createObjectURL(file);
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function () {
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    }, 0);
-  }
+  const file = new Blob([data], { type: type });
+  const a = document.createElement("a"),
+    url = URL.createObjectURL(file);
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () {
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }, 0);
 }
 
 (async function main() {
-  // const length = document.querySelectorAll('*[data-ui-name="rdrCard"]').length;
+  // TODO: const length = document.querySelectorAll('*[data-ui-name="rdrCard"]').length;
 
   let result = {};
 
   // We need to recompute `document.querySelectorAll('*[data-ui-name="rdrCard"]')` each time as the DOM changes between different pages
   // TODO: for (const index of [...Array(length).keys()]) {
-  // Only tarot cards for now
-  for (const index of [4, 5, 6, 7]) {
+  for (const index of [4, 5, 6, 7, 12, 13, 15]) {
     const card = document.querySelectorAll('*[data-ui-name="rdrCard"]')[index];
     result = { ...result, ...(await navigate(card)) };
   }
