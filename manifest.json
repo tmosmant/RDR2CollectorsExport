@@ -1,0 +1,14 @@
+{
+    "name": "RDR2CollectorsFetch",
+    "version": "1.0",
+    "description": "Fetch your collector bag from Rockstar Social Club",
+    "permissions": ["activeTab", "declarativeContent", "storage"],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "page_action": {
+        "default_popup": "popup.html"
+    },
+    "manifest_version": 2
+}
