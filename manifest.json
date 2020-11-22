@@ -8,6 +8,7 @@
         "persistent": false
     },
     "page_action": {
+        "default_icon": "./images/favicon.png",
         "default_popup": "./src/html/popup.html"
     },
     "manifest_version": 2
