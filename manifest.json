@@ -4,11 +4,11 @@
     "description": "Export your collector bag from Rockstar Social Club",
     "permissions": ["activeTab", "declarativeContent"],
     "background": {
-        "scripts": ["background.js"],
+        "scripts": ["./src/js/background.js"],
         "persistent": false
     },
     "page_action": {
-        "default_popup": "popup.html"
+        "default_popup": "./src/html/popup.html"
     },
     "manifest_version": 2
 }
